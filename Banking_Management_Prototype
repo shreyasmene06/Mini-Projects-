@@ -1,0 +1,73 @@
+class BankAccount{
+  public readonly accountNumber: string;
+  public ownerName: string;
+  private balance: number;
+  private transactionLog: string[]=[];
+  constructor(accountNumber: string, ownerName: string, initialBalance: number){
+    this.accountNumber=accountNumber;
+    this.balance=initialBalance;
+    this.ownerName=ownerName;
+    this.addTransaction(`Account opened with $${initialBalance}`)
+  }
+  //for getting the balance
+  public getBalance():number{
+    return this.balance
+  }
+  //for depositing money
+  public deposit(amount: number):void{
+    if(amount<=0) throw new Error("Deposit must me positive");
+    this.balance+=amount;
+    this.addTransaction(`Deposited $${amount}`)
+  }
+  //for withdrawing money
+  public withdraw(amount: number):void{
+    if(amount<=0) throw new Error("Withdraw must be positive");
+    if(amount>this.balance) throw new Error("Insufficient funds");
+    this.balance-=amount;
+    this.addTransaction(`Withdrew $${amount}`)
+  }
+  //for maintaining a transaction log
+  private addTransaction(description: string):void{
+    this.transactionLog.push(`${new Date().toISOString()}: ${description}`);
+  }
+  //making a copy of transaction log for auditors to access
+  protected fraudFlags: string[]=[];
+  protected getTransactionLog():string[]{
+    return [...this.transactionLog];
+  }
+  //making function for flagging frauds
+  protected flagFraud(reason: string):void{
+    this.fraudFlags.push(reason);
+    this.addTransaction(`Fraud Flag: ${reason}`);
+  }
+  
+}
+//making auditor class
+class Auditor extends BankAccount{
+  //giving it review accound method to add flags and maintain logs
+  public reviewAccount():{flags:string[],log: string[]}{
+    return{
+      flags:this.fraudFlags,
+      log:this.getTransactionLog()
+      
+    };
+  }
+}
+//testing for a case
+const alice = new BankAccount("111222", "Alice", 1000);
+alice.deposit(200); // OK: public method
+alice.withdraw(50); // OK: public method
+console.log(alice.getBalance()); // OK: public method
+
+//making the manager class
+class BankManager extends BankAccount{
+  public flagAccount(reason:string){
+    this.flagFraud(reason);
+  }
+}
+//adding a new manager
+const manager= new BankManager("222333","Charlie",5000);
+
+//flagging accounts as a manager cuz why not :>
+manager.flagAccount("Unuasual withdrawals");
+manager.balance=20;
