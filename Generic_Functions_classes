@@ -1,0 +1,40 @@
+class List<T>{
+  private items: T[] = [];
+  //add items
+  add(item:T){
+    this.items.push(item);
+  }
+  //show items
+  getAll():T[]{
+    return [...this.items];
+  }
+}
+class FeedbackBox<T>{
+  private feebacks: T[] = [];
+  //add feedbacks
+  addFeedback(feeback:T){
+    this.feebacks.push(feeback);
+  }
+  //show feedbacks
+  getAllFeedback():T[]{
+    return [...this.feebacks];
+  }
+}
+//for quiz feedback ("string")
+const quizFeedback = new FeedbackBox<string>();
+quizFeedback.addFeedback("Great job!");
+quizFeedback.addFeedback("Keep going!");
+console.log(quizFeedback.getAllFeedback()); 
+
+//for lesson feedback as obj
+type lessonFeedback={rating:number,comment:string};
+const lessonFeedback = new FeedbackBox<lessonFeedback>();
+lessonFeedback.addFeedback({rating:5,comment:"Great lesson!"})
+console.log(lessonFeedback.getAllFeedback()); 
+
+function getFirstItem<T>(items:T[]):T | undefined{
+  return items[0];
+}
+const firstQuizFeedback=getFirstItem(quizFeedback.getAllFeedback());
+const firstLessonFeedback=getFirstItem(lessonFeedback.getAllFeedback());
+
